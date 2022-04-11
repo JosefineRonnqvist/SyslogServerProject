@@ -13,6 +13,9 @@ namespace SyslogServerProject.SyslogHandlers
     {
         private const int PORT_NUMBER = 514;
 
+        /// <summary>
+        /// Recives messages from syslog and change format
+        /// </summary>
         public static void SyslogReader()
         {
             string sourceIP;
@@ -41,7 +44,7 @@ namespace SyslogServerProject.SyslogHandlers
                     Console.WriteLine($"Message from {sourceIP}:{remoteIpEndPoint.Port} received: ");
                     //Console.WriteLine($"{receivedAscii}");
 
-                    /* Start a new thread to handle received syslog event */
+                    // Start a new thread to handle received syslog event 
                     new Thread(new LogHandler(sourceIP, receivedAscii).HandleLog).Start();
                 }
                 catch (Exception e)

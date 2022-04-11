@@ -13,6 +13,10 @@ namespace SyslogServerProject.SyslogHandlers
 
         public SendBlacklist(){}
 
+        /// <summary>
+        /// Sends new blacklist to database, wuth todays date
+        /// </summary>
+        /// <param name="ip"></param>
         private void SendNewBlacklistToDB(string ip)
         {
             using (IDbConnection conn = new SqlConnection(ConnectionString))
@@ -27,6 +31,11 @@ namespace SyslogServerProject.SyslogHandlers
             }
         }
 
+        /// <summary>
+        /// Check if ip is in database
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <returns></returns>
         private bool CheckIfIpIsBlacklisted(string ip)
         {
             var query = @"SELECT host_ip FROM Blacklisted WHERE host_ip=@ip";
@@ -42,6 +51,10 @@ namespace SyslogServerProject.SyslogHandlers
             }
         }
 
+        /// <summary>
+        /// Send ip to blacklist
+        /// </summary>
+        /// <param name="ip">the ip address to blacklist</param>
         public void SendToBlacklist(string ip)
         {
             Console.WriteLine("Send to blacklist: " + ip);
@@ -69,7 +82,6 @@ namespace SyslogServerProject.SyslogHandlers
         //        {
         //            Console.Write("Error");
         //        }
-
         //    }
         //}
     }

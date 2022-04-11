@@ -21,22 +21,24 @@ namespace SyslogServerProject.SyslogHandlers
             _logData = logData.Replace(Environment.NewLine, "").Trim();
         }
 
+        /// <summary>
+        /// Open stream writer to write log
+        /// </summary>
         public void HandleLog()
         {
             int attempts = 0;
 
-            /* Thread safety first!*/
             while (true)
             {
                 try
                 {
-                    logWriter = new StreamWriter(_outputPath, true);/* Try to open the file for writing */
-                    canAccess = true; /* Success! */
+                    logWriter = new StreamWriter(_outputPath, true);// Try to open the file for writing 
+                    canAccess = true; 
                     break;
                 }
                 catch (IOException ex)
                 {
-                    /* Give up after 15 attempts */
+                    // Give up after 15 attempts 
                     if (attempts < 15)
                     {
                         attempts++;
@@ -52,6 +54,9 @@ namespace SyslogServerProject.SyslogHandlers
             WriteLog();
         }
 
+        /// <summary>
+        /// Write a log
+        /// </summary>
         void WriteLog()
         {
             // Write the line if the file is accessible 
@@ -79,6 +84,11 @@ namespace SyslogServerProject.SyslogHandlers
             }
         }
 
+        /// <summary>
+        /// Search field name and find its value
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
         private string GetValue(string fieldName)
         {
             string value = "";
