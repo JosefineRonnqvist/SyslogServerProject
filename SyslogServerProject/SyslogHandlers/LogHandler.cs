@@ -13,7 +13,7 @@ namespace SyslogServerProject.SyslogHandlers
         private string _clientIP;
         private string _logData;
         bool canAccess = false;
-        StreamWriter logWriter = null;
+        StreamWriter? logWriter = null;
 
         public LogHandler(string clientIP, string logData)
         {

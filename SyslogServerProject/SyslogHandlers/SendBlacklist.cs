@@ -1,6 +1,9 @@
-﻿using Dapper;
+﻿using ConnectToClavisterBlacklisting;
+using Dapper;
 using Dapper.Contrib.Extensions;
+using Microsoft.Extensions.Configuration;
 using SyslogServerProject.Models;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Net;
@@ -12,10 +15,25 @@ namespace SyslogServerProject.SyslogHandlers
 {
     internal class SendBlacklist
     {
-        private readonly string ConnectionString = "Data Source=COREIT-DRIFTSIN\\SQLEXPRESS;Initial Catalog=Coreit_clavister_blacklist;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
-        private int ttl = 300;
-        private string service= "all_services";
-        public SendBlacklist(){}
+        //private readonly string ConnectionString = "Data Source=COREIT-DRIFTSIN\\SQLEXPRESS;Initial Catalog=Coreit_clavister_blacklist;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+
+        //private readonly IConfiguration _configuration;
+        private readonly string connectionString;
+        ConnectionStringSettings settings =
+         ConfigurationManager.ConnectionStrings["BlacklistDBConn"];
+
+        /// <summary>
+        /// Uses IConfiguration to get the connectionstring from appsettings.json
+        /// </summary>
+        /// <param name="config">configuration</param>
+        public SendBlacklist(IConfiguration config)
+        {
+            //_configuration = config;
+            //this.connectionString = _configuration.GetConnectionString("BlacklistDBConn");
+            this.connectionString = settings.ConnectionString;
+        }
+
+        public SendBlacklist() { }
 
         /// <summary>
         /// Sends new blacklist to database, wuth todays date
@@ -23,14 +41,12 @@ namespace SyslogServerProject.SyslogHandlers
         /// <param name="ip"></param>
         private void SendNewBlacklistToDB(string ip)
         {
-            using (IDbConnection conn = new SqlConnection(ConnectionString))
+            using (IDbConnection conn = new SqlConnection(connectionString))
             {
                 Blacklist blacklist = new()
                 {
                     logDate = DateTime.Now,
                     host_ip = ip,
-                    ttl = ttl,
-                    service = service
                 };
                 var id = conn.Insert(blacklist);
                 Console.WriteLine("Id in DB: " + id);
@@ -45,7 +61,7 @@ namespace SyslogServerProject.SyslogHandlers
         private bool CheckIfIpIsBlacklisted(string ip)
         {
             var query = @"SELECT host_ip FROM Blacklisted WHERE host_ip=@ip";
-            using (IDbConnection conn = new SqlConnection(ConnectionString))
+            using (IDbConnection conn = new SqlConnection(connectionString))
             {
                 var alreadyBlacklisted = conn.QuerySingleOrDefault<Blacklist>(query, new { ip = ip });
                 if (alreadyBlacklisted is not null)
@@ -68,55 +84,24 @@ namespace SyslogServerProject.SyslogHandlers
             if (!CheckIfIpIsBlacklisted(ip))
             {
                 SendNewBlacklistToDB(ip);
-                SendToClavisterBlacklist(ip);
+                ToClavisterBlacklist sender = new ();
+                sender.SendToClavisterBlacklist(ip);
             }
         }
 
-        private void SendToClavisterBlacklist(string ip)
+        private void PrintListOfBlacklist()
         {
-            var handler = new HttpClientHandler();
-
-            handler.ClientCertificateOptions = ClientCertificateOption.Manual;
-
-            handler.ServerCertificateCustomValidationCallback =
-
-                (httpRequestMessage, cert, cetChain, policyErrors) =>
-
-                {
-
-                    return true;
-
-                };
-
-
-            using (var client = new HttpClient(handler))
+            ToClavisterBlacklist sender = new();
+            string param = "";
+            var blacklistedList = sender.ListBlacklist(param).Result;
+            if(blacklistedList is not null)
             {
-               
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Authorization",
-                Convert.ToBase64String(Encoding.Default.GetBytes("coreit:qQrqFuGOsHO8vmvV")));
-                string param = $"host={ip}&ttl={ttl}service={service}";
-                var result = client.PostAsJsonAsync(new Uri("https://81.21.224.5/api/oper/blacklist"), param).Result;
-
-                //string param = $"host={ip}&ttl={ttl}service={service}";
-                //WebRequest req = WebRequest.Create(@"https://81.21.224.5/" + param);
-                //req.Method = "POST";
-                //req.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes("coreit:qQrqFuGOsHO8vmvV"));
-                ////req.Credentials = new NetworkCredential("username", "password");
-                //HttpWebResponse resp = req.GetResponse() as HttpWebResponse;
-
-                //client.BaseAddress = new Uri("https://81.21.224.5/");
-
-                //var response = client.PostAsJsonAsync("api/oper/blacklist", param).Result;
-
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    Console.Write("Success");
-                //}
-                //else
-                //{
-                //    Console.Write("Error");
-                //}
+                 foreach (var blacklisted in blacklistedList)
+                 {
+                     Console.WriteLine("Found in Blacklist:" + blacklisted);
+                 }
             }
+           
         }
     }
 }

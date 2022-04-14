@@ -8,10 +8,19 @@ namespace SyslogServerProject.SyslogHandlers
 {
     internal class CheckValues
     {
-        public CheckValues() { }
-        
+        private readonly SendBlacklist sendBlacklist;
+        public CheckValues(SendBlacklist sendBlacklist) 
+        {
+            this.sendBlacklist = sendBlacklist;
+        }
+
+        public CheckValues()
+        {
+
+        }
+     
         private const int highest_rep_dest_score = 20;
-        private SendBlacklist sendBlacklist = new();
+       
         public void CheckValue(string iprep_dest_score, string categories, string connsrcip, string ip)
         {
             if (IsRepDestScoreToLow(iprep_dest_score) || IsCategoryFishing(categories))

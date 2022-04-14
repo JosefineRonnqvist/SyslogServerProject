@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConnectToClavisterBlacklisting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -52,6 +53,21 @@ namespace SyslogServerProject.SyslogHandlers
                     Console.WriteLine(e.ToString());
                 }
             }
+        }
+
+        public static void PrintListOfBlacklist()
+        {
+            ToClavisterBlacklist sender = new();
+            string param = "";
+            var blacklistedList = sender.ListBlacklist(param).Result;
+            if (blacklistedList is not null)
+            {
+                foreach (var blacklisted in blacklistedList)
+                {
+                    Console.WriteLine("Found in Blacklist:" + blacklisted);
+                }
+            }
+
         }
     }
 }
