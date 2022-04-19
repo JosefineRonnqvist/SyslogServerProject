@@ -1,4 +1,6 @@
-﻿using SyslogServerProject.Models;
+﻿using ConnectToClavisterBlacklisting.Models;
+using SyslogServerProject.Models;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
@@ -7,9 +9,9 @@ namespace ConnectToClavisterBlacklisting
 {
     public class ToClavisterBlacklist
     {
-        public ToClavisterBlacklist() 
+        public ToClavisterBlacklist()
         {
-            
+
         }
         private int ttl = 300;
         private string service = "all_services";
@@ -28,49 +30,64 @@ namespace ConnectToClavisterBlacklisting
             return client;
         }
 
-        public async Task SendToClavisterBlacklist(string ip)
+        public  void SendToClavisterBlacklist(string ip)
         {
-
-
             using (var client = CreateClient())
             {
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Authorization",
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
                 Convert.ToBase64String(Encoding.Default.GetBytes("coreit:qQrqFuGOsHO8vmvV")));
-                string param = $"host={ip}&ttl={ttl}service={service}";
-                var result = await client.PostAsJsonAsync(new Uri("https://81.21.224.5/api/oper/blacklist"), param);
+                client.BaseAddress = new Uri("https://81.21.224.5/");
+                try
+                {                   
+                    var formContent = new FormUrlEncodedContent(new[]
+                    {
+                        new KeyValuePair<string, string>("host", ip)
+                    });
 
-                //string param = $"host={ip}&ttl={ttl}service={service}";
-                //WebRequest req = WebRequest.Create(@"https://81.21.224.5/" + param);
-                //req.Method = "POST";
-                //req.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes("coreit:qQrqFuGOsHO8vmvV"));
-                ////req.Credentials = new NetworkCredential("username", "password");
-                //HttpWebResponse resp = req.GetResponse() as HttpWebResponse;
-
-                //client.BaseAddress = new Uri("https://81.21.224.5/");
-
-                //var response = client.PostAsJsonAsync("api/oper/blacklist", param).Result;
-
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    Console.Write("Success");
-                //}
-                //else
-                //{
-                //    Console.Write("Error");
-                //}
+                    var result = client.PostAsync("api/oper/blacklist", formContent).Result;
+                    if(result.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        Console.WriteLine($"{ip} added!");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Something went wrong!");
+                        Console.WriteLine(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
         }
         //public async Task RemoveBlacklist(string param)
         //{
+
         //    await httpClient.DeleteAsync($"api/oper/blacklist?{param}");
         //}
 
-        public async Task<IEnumerable<Blacklist?>> ListBlacklist(string param)
+        public async Task<ClavisterBlacklistResponse> ListBlacklist(string param)
         {
             using (var client = CreateClient())
             {
-                var blacklisted =  await client.GetFromJsonAsync<Blacklist[]>($"api/oper/blacklist{param}");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                Convert.ToBase64String(Encoding.Default.GetBytes("coreit:qQrqFuGOsHO8vmvV")));
+                client.BaseAddress = new Uri("https://81.21.224.5/");
+                var blacklisted = await client.GetFromJsonAsync<ClavisterBlacklistResponse>($"api/oper/blacklist{param}");
+                return blacklisted;
+            }
+        }
+
+
+        public async Task<string> ListBlacklistAsString(string param)
+        {
+            using (var client = CreateClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                Convert.ToBase64String(Encoding.Default.GetBytes("coreit:qQrqFuGOsHO8vmvV")));
+                client.BaseAddress = new Uri("https://81.21.224.5/");
+                var blacklisted = await client.GetStringAsync($"api/oper/blacklist{param}");
                 return blacklisted;
             }
         }

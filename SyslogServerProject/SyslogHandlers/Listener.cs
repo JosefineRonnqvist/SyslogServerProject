@@ -54,20 +54,5 @@ namespace SyslogServerProject.SyslogHandlers
                 }
             }
         }
-
-        public static void PrintListOfBlacklist()
-        {
-            ToClavisterBlacklist sender = new();
-            string param = "";
-            var blacklistedList = sender.ListBlacklist(param).Result;
-            if (blacklistedList is not null)
-            {
-                foreach (var blacklisted in blacklistedList)
-                {
-                    Console.WriteLine("Found in Blacklist:" + blacklisted);
-                }
-            }
-
-        }
     }
 }

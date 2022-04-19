@@ -1,4 +1,5 @@
 ﻿using ConnectToClavisterBlacklisting;
+using ConnectToClavisterBlacklisting.Models;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.Configuration;
@@ -26,14 +27,12 @@ namespace SyslogServerProject.SyslogHandlers
         /// Uses IConfiguration to get the connectionstring from appsettings.json
         /// </summary>
         /// <param name="config">configuration</param>
-        public SendBlacklist(IConfiguration config)
+        public SendBlacklist()
         {
-            //_configuration = config;
-            //this.connectionString = _configuration.GetConnectionString("BlacklistDBConn");
             this.connectionString = settings.ConnectionString;
         }
 
-        public SendBlacklist() { }
+        //public SendBlacklist() { }
 
         /// <summary>
         /// Sends new blacklist to database, wuth todays date
@@ -83,25 +82,39 @@ namespace SyslogServerProject.SyslogHandlers
 
             if (!CheckIfIpIsBlacklisted(ip))
             {
-                SendNewBlacklistToDB(ip);
+                //SendNewBlacklistToDB(ip);
                 ToClavisterBlacklist sender = new ();
                 sender.SendToClavisterBlacklist(ip);
             }
         }
 
-        private void PrintListOfBlacklist()
+        public void PrintListOfBlacklist()
         {
             ToClavisterBlacklist sender = new();
             string param = "";
-            var blacklistedList = sender.ListBlacklist(param).Result;
+            ClavisterBlacklistResponse blacklistedList = sender.ListBlacklist(param).Result;
             if(blacklistedList is not null)
             {
-                 foreach (var blacklisted in blacklistedList)
+                 foreach (var blacklisted in blacklistedList.blacklist_hosts)
                  {
-                     Console.WriteLine("Found in Blacklist:" + blacklisted);
+                     Console.WriteLine($"Found in Clavister Blacklist: {blacklisted}");
                  }
             }
            
+        }
+
+        public void PrintListOfBlacklistAsString()
+        {
+            ToClavisterBlacklist sender = new();
+            string param = "";
+            string blacklistedList = sender.ListBlacklistAsString(param).Result;
+            if (blacklistedList is not null)
+            {
+
+                Console.WriteLine($"Found in Clavister Blacklist:{ blacklistedList}");
+                
+            }
+
         }
     }
 }

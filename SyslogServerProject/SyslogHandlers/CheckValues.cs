@@ -8,7 +8,7 @@ namespace SyslogServerProject.SyslogHandlers
 {
     internal class CheckValues
     {
-        private readonly SendBlacklist sendBlacklist;
+        private readonly SendBlacklist sendBlacklist=new();
         public CheckValues(SendBlacklist sendBlacklist) 
         {
             this.sendBlacklist = sendBlacklist;
