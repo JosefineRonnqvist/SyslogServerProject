@@ -1,5 +1,6 @@
 ﻿using ConnectToClavisterBlacklisting.Models;
 using SyslogServerProject.Models;
+using System.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -23,12 +24,12 @@ namespace ConnectToClavisterBlacklisting
                 };
             var client = new HttpClient(handler);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-            Convert.ToBase64String(Encoding.Default.GetBytes("coreit:qQrqFuGOsHO8vmvV")));
+            Convert.ToBase64String(Encoding.Default.GetBytes($"{ConfigurationManager.AppSettings.Get("username")}:{ConfigurationManager.AppSettings.Get("password")}")));
             client.BaseAddress = new Uri("https://81.21.224.5/");
             return client;
         }
 
-        public  void SendToClavisterBlacklist(string ip)
+        public void SendToClavisterBlacklist(string ip)
         {
             using (var client = CreateClient())
             {             

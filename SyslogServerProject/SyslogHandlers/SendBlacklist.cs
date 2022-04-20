@@ -18,8 +18,7 @@ namespace SyslogServerProject.SyslogHandlers
     {
 
         private readonly string connectionString;
-        ConnectionStringSettings settings =
-         ConfigurationManager.ConnectionStrings["BlacklistDBConn"];
+        ConnectionStringSettings settings = ConfigurationManager.ConnectionStrings["BlacklistDBConn"];
 
         /// <summary>
         /// Uses Connectionsettings to get connectionstring from app.config
@@ -33,7 +32,7 @@ namespace SyslogServerProject.SyslogHandlers
         /// Sends new blacklist to database, wuth todays date
         /// </summary>
         /// <param name="ip"></param>
-        private async Task SendNewBlacklistToDB(string ip)
+        private void SendNewBlacklistToDB(string ip)
         {
             using (IDbConnection conn = new SqlConnection(connectionString))
             {
@@ -42,7 +41,7 @@ namespace SyslogServerProject.SyslogHandlers
                     logDate = DateTime.Now,
                     host_ip = ip,
                 };
-                var id = await conn.InsertAsync(blacklist);
+                var id = conn.Insert(blacklist);
                 Console.WriteLine("Id in DB: " + id);
             }
         }
@@ -71,13 +70,13 @@ namespace SyslogServerProject.SyslogHandlers
         /// </summary>
         /// <param name="blacklistInDB">blacklist with ip blacklisted before</param>
         /// <returns></returns>
-        private async Task UpdateBlacklistInDB(Blacklist blacklistInDB)
+        private void UpdateBlacklistInDB(Blacklist blacklistInDB)
         {
             using (IDbConnection conn = new SqlConnection(connectionString))
             {
                 blacklistInDB.logDate = DateTime.Now;
                
-                var id = await conn.UpdateAsync(blacklistInDB);
+                var id = conn.Update(blacklistInDB);
             }
         }
 
@@ -85,22 +84,27 @@ namespace SyslogServerProject.SyslogHandlers
         /// Send ip to blacklist
         /// </summary>
         /// <param name="ip">the ip address to blacklist</param>
-        public async Task SendToBlacklist(string ip)
+        public void SendToBlacklist(string ip)
         {
             Console.WriteLine("Send to blacklist: " + ip);
             var alreadyInDB = CheckIfIpIsBlacklisted(ip).Result;
 
             if(alreadyInDB is not null && !alreadyInDB.whitelisted)
             {        
-                await UpdateBlacklistInDB(alreadyInDB);      
+                UpdateBlacklistInDB(alreadyInDB);      
                 ToClavisterBlacklist sender = new ();
                 sender.SendToClavisterBlacklist(ip);
+                Console.WriteLine($"{ip} has been blacklisted before");
             }
             else if (alreadyInDB is null)
             {
-                await SendNewBlacklistToDB(ip);
+                SendNewBlacklistToDB(ip);
                 ToClavisterBlacklist sender = new();
                 sender.SendToClavisterBlacklist(ip);
+            }
+            else if (alreadyInDB.whitelisted)
+            {
+                Console.WriteLine($"{ip} is whitelisted");
             }
         }
 
