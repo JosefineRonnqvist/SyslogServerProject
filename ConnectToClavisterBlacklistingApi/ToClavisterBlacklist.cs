@@ -25,7 +25,7 @@ namespace ConnectToClavisterBlacklisting
             var client = new HttpClient(handler);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
             Convert.ToBase64String(Encoding.Default.GetBytes($"{ConfigurationManager.AppSettings.Get("username")}:{ConfigurationManager.AppSettings.Get("password")}")));
-            client.BaseAddress = new Uri("https://81.21.224.5/");
+            client.BaseAddress = new Uri($"{ConfigurationManager.AppSettings.Get("baseUri")}");
             return client;
         }
 
