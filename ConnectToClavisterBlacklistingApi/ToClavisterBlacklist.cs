@@ -9,12 +9,7 @@ namespace ConnectToClavisterBlacklisting
 {
     public class ToClavisterBlacklist
     {
-        public ToClavisterBlacklist()
-        {
-
-        }
-        private int ttl = 300;
-        private string service = "all_services";
+        public ToClavisterBlacklist() { }
 
         private HttpClient CreateClient()
         {
@@ -27,16 +22,16 @@ namespace ConnectToClavisterBlacklisting
                     return true;
                 };
             var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+            Convert.ToBase64String(Encoding.Default.GetBytes("coreit:qQrqFuGOsHO8vmvV")));
+            client.BaseAddress = new Uri("https://81.21.224.5/");
             return client;
         }
 
         public  void SendToClavisterBlacklist(string ip)
         {
             using (var client = CreateClient())
-            {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                Convert.ToBase64String(Encoding.Default.GetBytes("coreit:qQrqFuGOsHO8vmvV")));
-                client.BaseAddress = new Uri("https://81.21.224.5/");
+            {             
                 try
                 {                   
                     var formContent = new FormUrlEncodedContent(new[]
@@ -71,23 +66,7 @@ namespace ConnectToClavisterBlacklisting
         {
             using (var client = CreateClient())
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                Convert.ToBase64String(Encoding.Default.GetBytes("coreit:qQrqFuGOsHO8vmvV")));
-                client.BaseAddress = new Uri("https://81.21.224.5/");
                 var blacklisted = await client.GetFromJsonAsync<ClavisterBlacklistResponse>($"api/oper/blacklist{param}");
-                return blacklisted;
-            }
-        }
-
-
-        public async Task<string> ListBlacklistAsString(string param)
-        {
-            using (var client = CreateClient())
-            {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                Convert.ToBase64String(Encoding.Default.GetBytes("coreit:qQrqFuGOsHO8vmvV")));
-                client.BaseAddress = new Uri("https://81.21.224.5/");
-                var blacklisted = await client.GetStringAsync($"api/oper/blacklist{param}");
                 return blacklisted;
             }
         }

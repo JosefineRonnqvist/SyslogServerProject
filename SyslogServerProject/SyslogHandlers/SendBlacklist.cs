@@ -16,29 +16,24 @@ namespace SyslogServerProject.SyslogHandlers
 {
     internal class SendBlacklist
     {
-        //private readonly string ConnectionString = "Data Source=COREIT-DRIFTSIN\\SQLEXPRESS;Initial Catalog=Coreit_clavister_blacklist;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
-        //private readonly IConfiguration _configuration;
         private readonly string connectionString;
         ConnectionStringSettings settings =
          ConfigurationManager.ConnectionStrings["BlacklistDBConn"];
 
         /// <summary>
-        /// Uses IConfiguration to get the connectionstring from appsettings.json
+        /// Uses Connectionsettings to get connectionstring from app.config
         /// </summary>
-        /// <param name="config">configuration</param>
         public SendBlacklist()
         {
             this.connectionString = settings.ConnectionString;
         }
 
-        //public SendBlacklist() { }
-
         /// <summary>
         /// Sends new blacklist to database, wuth todays date
         /// </summary>
         /// <param name="ip"></param>
-        private void SendNewBlacklistToDB(string ip)
+        private async Task SendNewBlacklistToDB(string ip)
         {
             using (IDbConnection conn = new SqlConnection(connectionString))
             {
@@ -47,7 +42,7 @@ namespace SyslogServerProject.SyslogHandlers
                     logDate = DateTime.Now,
                     host_ip = ip,
                 };
-                var id = conn.Insert(blacklist);
+                var id = await conn.InsertAsync(blacklist);
                 Console.WriteLine("Id in DB: " + id);
             }
         }
@@ -57,18 +52,32 @@ namespace SyslogServerProject.SyslogHandlers
         /// </summary>
         /// <param name="ip"></param>
         /// <returns></returns>
-        private bool CheckIfIpIsBlacklisted(string ip)
+        private async Task<Blacklist?> CheckIfIpIsBlacklisted(string ip)
         {
-            var query = @"SELECT host_ip FROM Blacklisted WHERE host_ip=@ip";
+            var query = @"SELECT host_ip, whitelisted FROM Blacklisted WHERE host_ip=@ip";
             using (IDbConnection conn = new SqlConnection(connectionString))
             {
-                var alreadyBlacklisted = conn.QuerySingleOrDefault<Blacklist>(query, new { ip = ip });
+                var alreadyBlacklisted = await conn.QuerySingleOrDefaultAsync<Blacklist>(query, new { ip = ip });
                 if (alreadyBlacklisted is not null)
                 {
                     Console.WriteLine("Already in database: " + ip);
-                    return true;
                 }
-                return false;
+                return alreadyBlacklisted;
+            }
+        }
+
+        /// <summary>
+        /// Update existing blacklist with new logdate
+        /// </summary>
+        /// <param name="blacklistInDB">blacklist with ip blacklisted before</param>
+        /// <returns></returns>
+        private async Task UpdateBlacklistInDB(Blacklist blacklistInDB)
+        {
+            using (IDbConnection conn = new SqlConnection(connectionString))
+            {
+                blacklistInDB.logDate = DateTime.Now;
+               
+                var id = await conn.UpdateAsync(blacklistInDB);
             }
         }
 
@@ -76,18 +85,28 @@ namespace SyslogServerProject.SyslogHandlers
         /// Send ip to blacklist
         /// </summary>
         /// <param name="ip">the ip address to blacklist</param>
-        public void SendToBlacklist(string ip)
+        public async Task SendToBlacklist(string ip)
         {
             Console.WriteLine("Send to blacklist: " + ip);
+            var alreadyInDB = CheckIfIpIsBlacklisted(ip).Result;
 
-            if (!CheckIfIpIsBlacklisted(ip))
-            {
-                //SendNewBlacklistToDB(ip);
+            if(alreadyInDB is not null && !alreadyInDB.whitelisted)
+            {        
+                await UpdateBlacklistInDB(alreadyInDB);      
                 ToClavisterBlacklist sender = new ();
+                sender.SendToClavisterBlacklist(ip);
+            }
+            else if (alreadyInDB is null)
+            {
+                await SendNewBlacklistToDB(ip);
+                ToClavisterBlacklist sender = new();
                 sender.SendToClavisterBlacklist(ip);
             }
         }
 
+        /// <summary>
+        /// Get list of ip blacklisted by Clavister api
+        /// </summary>
         public void PrintListOfBlacklist()
         {
             ToClavisterBlacklist sender = new();
@@ -99,22 +118,7 @@ namespace SyslogServerProject.SyslogHandlers
                  {
                      Console.WriteLine($"Found in Clavister Blacklist: {blacklisted}");
                  }
-            }
-           
-        }
-
-        public void PrintListOfBlacklistAsString()
-        {
-            ToClavisterBlacklist sender = new();
-            string param = "";
-            string blacklistedList = sender.ListBlacklistAsString(param).Result;
-            if (blacklistedList is not null)
-            {
-
-                Console.WriteLine($"Found in Clavister Blacklist:{ blacklistedList}");
-                
-            }
-
+            }         
         }
     }
 }
