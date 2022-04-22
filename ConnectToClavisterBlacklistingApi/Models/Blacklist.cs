@@ -15,12 +15,12 @@ namespace SyslogServerProject.Models
         public int id { get; set; }
         public DateTime logDate { get; set; }
         public string host_ip { get; set; }
-        public int? status { get; set; }
-        public string? service { get; set; }
-        public int? ttl { get; set; }
-        public string? rule_name { get; set; }
-        public string? close_established { get; set; }
-        public string? description { get; set; }
+        public int? status { get; set; } 
+        public string? service { get; set; }= "all_services";
+        public int? ttl { get; set; } = 300;
+        public string? rule_name { get; set; } = null;
+        public string? close_established { get; set; } = "no";
+        public string? description { get; set; } = null;
         public bool whitelisted { get; set; }
         public int user_id { get; set; }
         public DateTime? changeDate { get; set; }

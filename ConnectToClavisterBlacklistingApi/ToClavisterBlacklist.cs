@@ -29,21 +29,27 @@ namespace ConnectToClavisterBlacklisting
             return client;
         }
 
-        public void SendToClavisterBlacklist(string ip)
+        public void SendToClavisterBlacklist(Blacklist blacklist)
         {
             using (var client = CreateClient())
             {             
                 try
                 {                   
-                    var formContent = new FormUrlEncodedContent(new[]
+                    var formContent = new FormUrlEncodedContent(new []
                     {
-                        new KeyValuePair<string, string>("host", ip)
+                        new KeyValuePair<string, string>("host", blacklist.host_ip),
+                          new KeyValuePair<string, string>("service", blacklist.service),
+                         new KeyValuePair<string, string>("ttl", blacklist.ttl.ToString()),                       
+                            new KeyValuePair<string, string>("rule_name", blacklist.rule_name),                    
+                           new KeyValuePair<string, string>("close_established", blacklist.close_established),
+                            new KeyValuePair<string, string>("description", blacklist.description),
+
                     });
 
                     var result = client.PostAsync("api/oper/blacklist", formContent).Result;
                     if(result.StatusCode == System.Net.HttpStatusCode.OK)
                     {
-                        Console.WriteLine($"{ip} added!");
+                        Console.WriteLine($"{blacklist.host_ip} added!");
                     }
                     else
                     {
