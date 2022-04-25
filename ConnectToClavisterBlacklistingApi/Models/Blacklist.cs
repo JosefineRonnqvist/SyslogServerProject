@@ -18,9 +18,9 @@ namespace SyslogServerProject.Models
         public int? status { get; set; } 
         public string? service { get; set; }= "all_services";
         public int? ttl { get; set; } = 300;
-        public string? rule_name { get; set; } = null;
-        public string? close_established { get; set; } = "no";
-        public string? description { get; set; } = null;
+        public string? rule_name { get; set; }
+        public bool close_established { get; set; } = false;
+        public string? description { get; set; }
         public bool whitelisted { get; set; }
         public int user_id { get; set; }
         public DateTime? changeDate { get; set; }

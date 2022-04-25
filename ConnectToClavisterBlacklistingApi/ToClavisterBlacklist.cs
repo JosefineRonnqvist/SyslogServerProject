@@ -40,9 +40,9 @@ namespace ConnectToClavisterBlacklisting
                         new KeyValuePair<string, string>("host", blacklist.host_ip),
                           new KeyValuePair<string, string>("service", blacklist.service),
                          new KeyValuePair<string, string>("ttl", blacklist.ttl.ToString()),                       
-                            new KeyValuePair<string, string>("rule_name", blacklist.rule_name),                    
-                           new KeyValuePair<string, string>("close_established", blacklist.close_established),
-                            new KeyValuePair<string, string>("description", blacklist.description),
+                            //new KeyValuePair<string, string?>("rule_name", blacklist.rule_name),                    
+                           new KeyValuePair<string, string>("close_established", ChangeBoolToString(blacklist.close_established)),
+                            //new KeyValuePair<string, string?>("description", blacklist.description),
 
                     });
 
@@ -63,6 +63,19 @@ namespace ConnectToClavisterBlacklisting
                 }
             }
         }
+
+        private string ChangeBoolToString(bool boolean)
+        {
+            if (boolean)
+            {
+                return "yes";
+            }
+            else
+            {
+                return "no";
+            }
+        }
+
         //public async Task RemoveBlacklist(string param)
         //{
 
