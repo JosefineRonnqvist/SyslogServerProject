@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SyslogServerProject.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,11 +28,19 @@ namespace SyslogServerProject.SyslogHandlers
             {
                 if (connsrcip is not null && connsrcip.Trim() != "")
                 {
-                    sendBlacklist.SendToBlacklist(connsrcip);
+                    Blacklist blacklist = new()
+                    {
+                        host_ip = connsrcip,
+                    };
+                    sendBlacklist.SendToBlacklist(blacklist);
                 }
                 if (ip is not null && ip.Trim() != "")
                 {
-                    sendBlacklist.SendToBlacklist(ip);
+                    Blacklist blacklist = new()
+                    {
+                        host_ip = ip,
+                    };
+                    sendBlacklist.SendToBlacklist(blacklist);
                 }
             }
         }

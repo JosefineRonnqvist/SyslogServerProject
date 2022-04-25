@@ -32,7 +32,7 @@ namespace SyslogServerProject.SyslogHandlers
         /// Sends new blacklist to database, wuth todays date
         /// </summary>
         /// <param name="ip"></param>
-        private void SendNewBlacklistToDB(string ip)
+        private int SendNewBlacklistToDB(string ip)
         {
             using (IDbConnection conn = new SqlConnection(connectionString))
             {
@@ -41,8 +41,9 @@ namespace SyslogServerProject.SyslogHandlers
                     logDate = DateTime.Now,
                     host_ip = ip,
                 };
-                var id = conn.Insert(blacklist);
+                var id = (int)conn.Insert(blacklist);
                 Console.WriteLine("Id in DB: " + id);
+                return id;
             }
         }
 
@@ -66,6 +67,24 @@ namespace SyslogServerProject.SyslogHandlers
         }
 
         /// <summary>
+        /// Gets the log of the blacklisted ip
+        /// </summary>
+        /// <param name="id">id of blacklisted ip</param>
+        /// <returns>list of the logs of this ip</returns>
+        private async Task<IEnumerable<BlacklistLog?>> CheckIpBlacklistLog(int id)
+        {
+            var query = @"SELECT id, blacklistedId, logDate, ttl 
+                        FROM BlacklistedLogs
+                        WHERE blacklistedId=@blacklistedId
+                        ORDER BY id";
+            using (IDbConnection conn = new SqlConnection(connectionString))
+            {
+                var blacklistLog = await conn.QueryAsync<BlacklistLog>(query, new { blacklistedId = id });
+                return blacklistLog.ToList();
+            }
+        }
+
+        /// <summary>
         /// Update existing blacklist with new logdate
         /// </summary>
         /// <param name="blacklistInDB">blacklist with ip blacklisted before</param>
@@ -75,8 +94,37 @@ namespace SyslogServerProject.SyslogHandlers
             using (IDbConnection conn = new SqlConnection(connectionString))
             {
                 blacklistInDB.logDate = DateTime.Now;
-               
+
                 var id = conn.Update(blacklistInDB);
+            }
+        }
+
+        /// <summary>
+        /// Log this blacklist
+        /// </summary>
+        /// <param name="log">The blacklist</param>
+        private void LogBlacklist(int id)
+        {
+            using (IDbConnection conn = new SqlConnection(connectionString))
+            {
+                var newLog = new BlacklistLog
+                {
+                    blacklistedId = id,
+                    logDate = DateTime.Now,
+                };
+                conn.Insert(newLog);
+            }
+        }
+
+        /// <summary>
+        /// Delete log when to many
+        /// </summary>
+        /// <param name="id">id of logged blacklist</param>
+        private void DeleteOldestBlacklist(int id)
+        {
+            using (IDbConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Delete(new BlacklistLog { id = id });
             }
         }
 
@@ -84,28 +132,53 @@ namespace SyslogServerProject.SyslogHandlers
         /// Send ip to blacklist
         /// </summary>
         /// <param name="ip">the ip address to blacklist</param>
-        public void SendToBlacklist(string ip)
+        public void SendToBlacklist(Blacklist blacklist)
         {
-            Console.WriteLine("Send to blacklist: " + ip);
-            var alreadyInDB = CheckIfIpIsBlacklisted(ip).Result;
+            Console.WriteLine("Send to blacklist: " + blacklist.host_ip);
+            var alreadyInDB = CheckIfIpIsBlacklisted(blacklist.host_ip).Result;
 
-            if(alreadyInDB is not null && !alreadyInDB.whitelisted)
-            {        
-                UpdateBlacklistInDB(alreadyInDB);      
-                ToClavisterBlacklist sender = new ();
-                sender.SendToClavisterBlacklist(ip);
-                Console.WriteLine($"{ip} has been blacklisted before");
+
+            if (alreadyInDB is not null)
+            {
+                var blacklistLog = CheckIpBlacklistLog(alreadyInDB.id).Result;
+                var numberOfLogs = blacklistLog.Count();
+
+                if (!alreadyInDB.whitelisted)
+                {
+                    if (alreadyInDB.logDate.AddSeconds(alreadyInDB.ttl) < DateTime.Now)
+                    {
+                        if (numberOfLogs >= 10)
+                        {
+                            var id = blacklistLog.Last().id;
+                            DeleteOldestBlacklist(id);
+                        }                      
+                        UpdateBlacklistInDB(alreadyInDB);
+                        CallLogAndClavisterSender(alreadyInDB.id, blacklist);
+                        Console.WriteLine($"{blacklist.host_ip} has been blacklisted before");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{blacklist.host_ip} is already blacklisted");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"{blacklist.host_ip} is whitelisted");
+                }
             }
             else if (alreadyInDB is null)
             {
-                SendNewBlacklistToDB(ip);
-                ToClavisterBlacklist sender = new();
-                sender.SendToClavisterBlacklist(ip);
+                var id= SendNewBlacklistToDB(blacklist.host_ip);
+                CallLogAndClavisterSender(id,blacklist);
             }
-            else if (alreadyInDB.whitelisted)
-            {
-                Console.WriteLine($"{ip} is whitelisted");
-            }
+
+        }
+        
+        private void CallLogAndClavisterSender(int id, Blacklist blacklist)
+        {
+            LogBlacklist(id);
+            ToClavisterBlacklist sender = new();
+            sender.SendToClavisterBlacklist(blacklist);
         }
 
         /// <summary>
@@ -116,13 +189,13 @@ namespace SyslogServerProject.SyslogHandlers
             ToClavisterBlacklist sender = new();
             string param = "";
             ClavisterBlacklistResponse blacklistedList = sender.ListBlacklist(param).Result;
-            if(blacklistedList is not null)
+            if (blacklistedList is not null)
             {
-                 foreach (var blacklisted in blacklistedList.blacklist_hosts)
-                 {
-                     Console.WriteLine($"Found in Clavister Blacklist: {blacklisted}");
-                 }
-            }         
+                foreach (var blacklisted in blacklistedList.blacklist_hosts)
+                {
+                    Console.WriteLine($"Found in Clavister Blacklist: {blacklisted}");
+                }
+            }
         }
     }
 }

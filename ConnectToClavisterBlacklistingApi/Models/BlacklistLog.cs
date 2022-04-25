@@ -15,6 +15,6 @@ namespace ConnectToClavisterBlacklisting.Models
         public int id { get; set; }
         public int blacklistedId { get; set; }
         public DateTime logDate { get; set; }
-        public int? ttl { get; set; }
+        public double ttl { get; set; } = 300;
     }
 }

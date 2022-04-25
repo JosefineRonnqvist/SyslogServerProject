@@ -17,7 +17,7 @@ namespace SyslogServerProject.Models
         public string host_ip { get; set; }
         public int? status { get; set; } 
         public string? service { get; set; }= "all_services";
-        public int? ttl { get; set; } = 300;
+        public double ttl { get; set; } = 300;
         public string? rule_name { get; set; }
         public bool close_established { get; set; } = false;
         public string? description { get; set; }

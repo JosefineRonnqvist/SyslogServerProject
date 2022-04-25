@@ -1,8 +1,13 @@
-﻿using SyslogServerProject.SyslogHandlers;
+﻿using SyslogServerProject.Models;
+using SyslogServerProject.SyslogHandlers;
 
 
 SendBlacklist send = new();
-send.SendToBlacklist("123.34.44.2.2");
+Blacklist blacklist = new()
+{
+    host_ip="111.0.0.2",
+};
+send.SendToBlacklist(blacklist);
 //send.PrintListOfBlacklist();
 //Listener.SyslogReader();
 
