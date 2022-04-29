@@ -5,9 +5,9 @@ using SyslogServerProject.SyslogHandlers;
 SendBlacklist send = new();
 Blacklist blacklist = new()
 {
-    host_ip="111.0.0.2",
+    host_ip="1.1.1.2",
 };
 send.SendToBlacklist(blacklist);
-//send.PrintListOfBlacklist();
+send.PrintListOfBlacklist();
 //Listener.SyslogReader();
 

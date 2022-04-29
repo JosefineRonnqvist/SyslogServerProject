@@ -1,17 +1,19 @@
 using ConnectToClavisterBlacklisting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SyslogServerProject.Models;
 
 namespace SyslogServerProjectTests
 {
     [TestClass]
     public class ToClavisterBlacklistTest
     {
-        //    [TestMethod]
-        //    public async Task SendToClavisterBlacklistReturn()
-        //    {
-        //        var connect = new ToClavisterBlacklist();
+        [TestMethod]
+        public void SendToClavisterBlacklistReturn()
+        {
+            var connect = new ToClavisterBlacklist();
+            Blacklist blacklist = new() { host_ip = "1.1.1.1" };
 
-        //        connect.SendToClavisterBlacklist("10.50.20.169");
-        //    }
+            connect.SendToClavisterBlacklist(blacklist);
+        }
     }
 }

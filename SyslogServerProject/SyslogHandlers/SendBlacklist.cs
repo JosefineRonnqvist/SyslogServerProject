@@ -54,7 +54,7 @@ namespace SyslogServerProject.SyslogHandlers
         /// <returns></returns>
         private async Task<Blacklist?> CheckIfIpIsBlacklisted(string ip)
         {
-            var query = @"SELECT host_ip, whitelisted FROM Blacklisted WHERE host_ip=@ip";
+            var query = @"SELECT id, host_ip, whitelisted FROM Blacklisted WHERE host_ip=@ip";
             using (IDbConnection conn = new SqlConnection(connectionString))
             {
                 var alreadyBlacklisted = await conn.QuerySingleOrDefaultAsync<Blacklist>(query, new { ip = ip });
