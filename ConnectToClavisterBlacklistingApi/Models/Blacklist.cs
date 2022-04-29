@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace SyslogServerProject.Models
 {
+    /// <summary>
+    /// Information about blacklist that is stored in database
+    /// </summary>
     [Table("Blacklisted")]
     public class Blacklist
     {

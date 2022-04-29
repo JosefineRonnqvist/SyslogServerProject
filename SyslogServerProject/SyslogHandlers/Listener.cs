@@ -43,7 +43,6 @@ namespace SyslogServerProject.SyslogHandlers
                     string receivedAscii = Encoding.ASCII.GetString(receivedBytes);
 
                     Console.WriteLine($"Message from {sourceIP}:{remoteIpEndPoint.Port} received: ");
-                    //Console.WriteLine($"{receivedAscii}");
 
                     // Start a new thread to handle received syslog event 
                     new Thread(new LogHandler(sourceIP, receivedAscii).HandleLog).Start();

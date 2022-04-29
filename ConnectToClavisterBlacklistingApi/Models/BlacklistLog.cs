@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace ConnectToClavisterBlacklisting.Models
 {
+    /// <summary>
+    /// Logs if the same ip is blacklisted many times
+    /// </summary>
     [Table("BlacklistedLogs")]
     public class BlacklistLog
     {

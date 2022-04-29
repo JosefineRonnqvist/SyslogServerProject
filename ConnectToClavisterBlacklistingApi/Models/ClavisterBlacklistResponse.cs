@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ConnectToClavisterBlacklisting.Models
 {
+    /// <summary>
+    /// The information that Clavister-api stores
+    /// </summary>
     public class BlacklistHost
     {
         public string? host { get; set; }

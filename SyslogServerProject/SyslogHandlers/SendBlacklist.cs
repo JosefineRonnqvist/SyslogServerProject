@@ -129,7 +129,9 @@ namespace SyslogServerProject.SyslogHandlers
         }
 
         /// <summary>
-        /// Send ip to blacklist
+        /// Send ip to blacklist.
+        /// Check if blacklisted before, if time to live ended and if whitelisted.
+        /// log the blacklist, if more then 10 is logged delete oldest. 
         /// </summary>
         /// <param name="ip">the ip address to blacklist</param>
         public void SendToBlacklist(Blacklist blacklist)
@@ -174,6 +176,11 @@ namespace SyslogServerProject.SyslogHandlers
 
         }
         
+        /// <summary>
+        /// Log the blacklist and send to Clavister
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="blacklist"></param>
         private void CallLogAndClavisterSender(int id, Blacklist blacklist)
         {
             LogBlacklist(id);
