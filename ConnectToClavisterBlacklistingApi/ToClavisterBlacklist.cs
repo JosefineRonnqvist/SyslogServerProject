@@ -39,15 +39,15 @@ namespace ConnectToClavisterBlacklisting
                     {
                         new KeyValuePair<string, string>("host", blacklist.host_ip),
                           new KeyValuePair<string, string>("service", blacklist.service),
-                         new KeyValuePair<string, string>("ttl", blacklist.ttl.ToString()),                       
-                            //new KeyValuePair<string, string?>("rule_name", blacklist.rule_name),                    
+                         new KeyValuePair<string, string>("ttl", blacklist.ttl.ToString()),   
                            new KeyValuePair<string, string>("close_established", ChangeBoolToString(blacklist.close_established)),
-                            //new KeyValuePair<string, string?>("description", blacklist.description),
+                        new KeyValuePair<string, string>("rule_name", blacklist.rule_name),
+                            new KeyValuePair<string, string>("description", blacklist.description),
 
                     });
 
                     var result = client.PostAsync("api/oper/blacklist", formContent).Result;
-                    if(result.StatusCode == System.Net.HttpStatusCode.OK)
+                    if(result.IsSuccessStatusCode)
                     {
                         Console.WriteLine($"{blacklist.host_ip} added!");
                     }

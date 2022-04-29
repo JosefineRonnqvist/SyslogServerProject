@@ -16,11 +16,11 @@ namespace SyslogServerProject.Models
         public DateTime logDate { get; set; }
         public string host_ip { get; set; }
         public int? status { get; set; } 
-        public string? service { get; set; }= "all_services";
+        public string service { get; set; }= "all_services";
         public double ttl { get; set; } = 300;
-        public string? rule_name { get; set; }
+        public string rule_name { get; set; } = "null";
         public bool close_established { get; set; } = false;
-        public string? description { get; set; }
+        public string description { get; set; } = "null";
         public bool whitelisted { get; set; }
         public int user_id { get; set; }
         public DateTime? changeDate { get; set; }
