@@ -2,15 +2,10 @@
 using ConnectToClavisterBlacklisting.Models;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using Microsoft.Extensions.Configuration;
 using SyslogServerProject.Models;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Text;
 
 namespace SyslogServerProject.SyslogHandlers
 {
