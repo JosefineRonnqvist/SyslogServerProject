@@ -11,12 +11,12 @@ namespace ConnectToClavisterBlacklisting.Models
     /// </summary>
     public class BlacklistHost
     {
-        public string? host { get; set; }
-        public string? service { get; set; }
+        public string host { get; set; }
+        public string service { get; set; }
         public int? ttl { get; set; }
-        public string? alert_type { get; set; }
-        public string? rule_name { get; set; }
-        public string? description { get; set; }
+        public string alert_type { get; set; }
+        public string rule_name { get; set; }
+        public string description { get; set; }
 
         public override string ToString()
         {

@@ -189,8 +189,7 @@ namespace SyslogServerProject.SyslogHandlers
         public void PrintListOfBlacklist()
         {
             ToClavisterBlacklist sender = new();
-            string param = "";
-            ClavisterBlacklistResponse blacklistedList = sender.ListBlacklist(param).Result;
+            ClavisterBlacklistResponse blacklistedList = sender.ListBlacklist().Result;
             if (blacklistedList is not null)
             {
                 foreach (var blacklisted in blacklistedList.blacklist_hosts)

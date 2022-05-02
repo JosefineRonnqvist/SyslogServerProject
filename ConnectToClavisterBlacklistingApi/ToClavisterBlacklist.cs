@@ -95,11 +95,11 @@ namespace ConnectToClavisterBlacklisting
         /// </summary>
         /// <param name="alert_type"></param>
         /// <returns>Response from Clavister</returns>
-        public async Task<ClavisterBlacklistResponse> ListBlacklist(string alert_type)
+        public async Task<ClavisterBlacklistResponse> ListBlacklist()
         {
             using (var client = CreateClient())
             {
-                var blacklisted = await client.GetFromJsonAsync<ClavisterBlacklistResponse>($"api/oper/blacklist{alert_type}");
+                var blacklisted = await client.GetFromJsonAsync<ClavisterBlacklistResponse>($"api/oper/blacklist");
                 return blacklisted;
             }
         }
