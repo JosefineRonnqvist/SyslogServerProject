@@ -187,7 +187,7 @@ namespace SyslogServerProject.SyslogHandlers
         /// </summary>
         public void PrintListOfBlacklist()
         {
-            ClavisterBlacklistResponse blacklistedList = ToClavisterBlacklist.ListBlacklist().Result;
+            var blacklistedList = ToClavisterBlacklist.ListBlacklist().Result;
             if (blacklistedList is null) throw new ArgumentNullException(nameof(blacklistedList));
 
             foreach (var blacklisted in blacklistedList.blacklist_hosts)
