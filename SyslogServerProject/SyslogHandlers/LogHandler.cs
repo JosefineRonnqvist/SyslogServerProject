@@ -67,6 +67,7 @@ namespace SyslogServerProject.SyslogHandlers
                 string connsrcip = GetValue("connsrcip=");
                 string ip = GetValue("ip=");
 
+                if (logWriter is null) throw new ArgumentNullException(nameof(logWriter));
                 logWriter.WriteLine(DateTime.Now.ToString());
                 logWriter.WriteLine($"rule={GetValue("rule=")}");
                 logWriter.WriteLine($"categories={categories}");

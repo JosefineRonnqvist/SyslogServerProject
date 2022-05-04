@@ -138,6 +138,7 @@ namespace SyslogServerProject.SyslogHandlers
             if (alreadyInDB is not null)
             {
                 var blacklistLog = CheckIpBlacklistLog(alreadyInDB.id).Result;
+                if (blacklistLog is null) throw new ArgumentNullException(nameof(blacklistLog));
                 var numberOfLogs = blacklistLog.Count();
 
                 if (!alreadyInDB.whitelisted)
@@ -148,7 +149,7 @@ namespace SyslogServerProject.SyslogHandlers
                         {
                             var id = blacklistLog.Last().id;
                             DeleteOldestBlacklist(id);
-                        }                      
+                        }
                         UpdateBlacklistInDB(alreadyInDB);
                         CallLogAndClavisterSender(alreadyInDB.id, blacklist);
                         Console.WriteLine($"{blacklist.host_ip} has been blacklisted before");
@@ -165,12 +166,11 @@ namespace SyslogServerProject.SyslogHandlers
             }
             else if (alreadyInDB is null)
             {
-                var id= SendNewBlacklistToDB(blacklist.host_ip);
-                CallLogAndClavisterSender(id,blacklist);
+                var id = SendNewBlacklistToDB(blacklist.host_ip);
+                CallLogAndClavisterSender(id, blacklist);
             }
-
         }
-        
+
         /// <summary>
         /// Log the blacklist and send to Clavister
         /// </summary>
@@ -179,8 +179,7 @@ namespace SyslogServerProject.SyslogHandlers
         private void CallLogAndClavisterSender(int id, Blacklist blacklist)
         {
             LogBlacklist(id);
-            ToClavisterBlacklist sender = new();
-            sender.SendToClavisterBlacklist(blacklist);
+            ToClavisterBlacklist.SendToClavisterBlacklist(blacklist);
         }
 
         /// <summary>
@@ -188,14 +187,12 @@ namespace SyslogServerProject.SyslogHandlers
         /// </summary>
         public void PrintListOfBlacklist()
         {
-            ToClavisterBlacklist sender = new();
-            ClavisterBlacklistResponse blacklistedList = sender.ListBlacklist().Result;
-            if (blacklistedList is not null)
+            ClavisterBlacklistResponse blacklistedList = ToClavisterBlacklist.ListBlacklist().Result;
+            if (blacklistedList is null) throw new ArgumentNullException(nameof(blacklistedList));
+
+            foreach (var blacklisted in blacklistedList.blacklist_hosts)
             {
-                foreach (var blacklisted in blacklistedList.blacklist_hosts)
-                {
-                    Console.WriteLine($"Found in Clavister Blacklist: {blacklisted}");
-                }
+                Console.WriteLine($"Found in Clavister Blacklist: {blacklisted}");
             }
         }
     }

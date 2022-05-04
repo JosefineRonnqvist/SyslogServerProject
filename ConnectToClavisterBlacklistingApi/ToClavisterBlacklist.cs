@@ -16,9 +16,9 @@ namespace ConnectToClavisterBlacklisting
         /// Creates a client with username, password and base address from appsettings
         /// </summary>
         /// <returns>Connection to Clavisters api</returns>
-        private HttpClient CreateClient()
+        private static HttpClient CreateClient()
         {
-            var handler = new HttpClientHandler();
+            HttpClientHandler handler = new ();
             handler.ClientCertificateOptions = ClientCertificateOption.Manual;
             handler.ServerCertificateCustomValidationCallback =
 
@@ -26,7 +26,7 @@ namespace ConnectToClavisterBlacklisting
                 {
                     return true;
                 };
-            var client = new HttpClient(handler);
+            HttpClient client = new (handler);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
             Convert.ToBase64String(Encoding.Default.GetBytes($"{ConfigurationManager.AppSettings["username"]}:{ConfigurationManager.AppSettings["password"]}")));
             client.BaseAddress = new Uri($"{ConfigurationManager.AppSettings.Get("baseUri")}");
@@ -37,12 +37,11 @@ namespace ConnectToClavisterBlacklisting
         /// Post a blacklist to Clavister-api
         /// </summary>
         /// <param name="blacklist">parameters for the blacklist</param>
-        public void SendToClavisterBlacklist(Blacklist blacklist)
+        public static void SendToClavisterBlacklist(Blacklist blacklist)
         {
-            using (var client = CreateClient())
+            using var client = CreateClient();
+            var formContent = new FormUrlEncodedContent(new[]
             {
-                var formContent = new FormUrlEncodedContent(new[]
-                {
                         new KeyValuePair<string, string>("host", blacklist.host_ip),
                           new KeyValuePair<string, string>("service", blacklist.service),
                          new KeyValuePair<string, string>("ttl", blacklist.ttl.ToString()),
@@ -52,16 +51,15 @@ namespace ConnectToClavisterBlacklisting
 
                     });
 
-                var result = client.PostAsync("api/oper/blacklist", formContent).Result;
-                if (result.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"{blacklist.host_ip} added!");
-                }
-                else
-                {
-                    Console.WriteLine($"Something went wrong!");
-                    Console.WriteLine(result.Content);
-                }
+            var result = client.PostAsync("api/oper/blacklist", formContent).Result;
+            if (result.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"{blacklist.host_ip} added!");
+            }
+            else
+            {
+                Console.WriteLine($"Something went wrong!");
+                Console.WriteLine(result.Content);
             }
         }
 
@@ -70,7 +68,7 @@ namespace ConnectToClavisterBlacklisting
         /// </summary>
         /// <param name="boolean"></param>
         /// <returns>yes or no</returns>
-        private string ChangeBoolToString(bool boolean)
+        private static string ChangeBoolToString(bool boolean)
         {
             if (boolean) { return "yes"; }
             else { return "no"; }
@@ -81,13 +79,11 @@ namespace ConnectToClavisterBlacklisting
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task RemoveBlacklist(string param)
+        public static async Task RemoveBlacklist(string param)
         {
-            using (var client = CreateClient())
-            {
-               await client.DeleteAsync($"api/oper/blacklist?{param}");
-            }
-            
+            using var client = CreateClient();
+            await client.DeleteAsync($"api/oper/blacklist?{param}");
+
         }
 
         /// <summary>
@@ -95,13 +91,10 @@ namespace ConnectToClavisterBlacklisting
         /// </summary>
         /// <param name="alert_type"></param>
         /// <returns>Response from Clavister</returns>
-        public async Task<ClavisterBlacklistResponse> ListBlacklist()
+        public static async Task<ClavisterBlacklistResponse?> ListBlacklist()
         {
-            using (var client = CreateClient())
-            {
-                var blacklisted = await client.GetFromJsonAsync<ClavisterBlacklistResponse>($"api/oper/blacklist");
-                return blacklisted;
-            }
+            using var client = CreateClient();
+            return await client.GetFromJsonAsync<ClavisterBlacklistResponse>($"api/oper/blacklist");
         }
     }
 }
