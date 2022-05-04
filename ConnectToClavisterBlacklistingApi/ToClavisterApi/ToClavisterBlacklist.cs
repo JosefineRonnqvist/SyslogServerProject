@@ -16,9 +16,9 @@ namespace ConnectToClavisterBlacklisting
         /// Creates a client with username, password and base address from appsettings
         /// </summary>
         /// <returns>Connection to Clavisters api</returns>
-        private static HttpClient CreateClient()
+        private HttpClient CreateClient()
         {
-            HttpClientHandler handler = new ();
+            HttpClientHandler handler = new();
             handler.ClientCertificateOptions = ClientCertificateOption.Manual;
             handler.ServerCertificateCustomValidationCallback =
 
@@ -26,7 +26,7 @@ namespace ConnectToClavisterBlacklisting
                 {
                     return true;
                 };
-            HttpClient client = new (handler);
+            HttpClient client = new(handler);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
             Convert.ToBase64String(Encoding.Default.GetBytes($"{ConfigurationManager.AppSettings["username"]}:{ConfigurationManager.AppSettings["password"]}")));
             client.BaseAddress = new Uri($"{ConfigurationManager.AppSettings.Get("baseUri")}");
@@ -37,7 +37,7 @@ namespace ConnectToClavisterBlacklisting
         /// Post a blacklist to Clavister-api
         /// </summary>
         /// <param name="blacklist">parameters for the blacklist</param>
-        public static void SendToClavisterBlacklist(Blacklist blacklist)
+        public HttpResponseMessage SendToClavisterBlacklist(Blacklist blacklist)
         {
             using var client = CreateClient();
             var formContent = new FormUrlEncodedContent(new[]
@@ -48,8 +48,7 @@ namespace ConnectToClavisterBlacklisting
                            new KeyValuePair<string, string>("close_established", ChangeBoolToString(blacklist.close_established)),
                         new KeyValuePair<string, string>("rule_name", blacklist.rule_name),
                             new KeyValuePair<string, string>("description", blacklist.description),
-
-                    });
+            });
 
             var result = client.PostAsync("api/oper/blacklist", formContent).Result;
             if (result.IsSuccessStatusCode)
@@ -61,6 +60,7 @@ namespace ConnectToClavisterBlacklisting
                 Console.WriteLine($"Something went wrong!");
                 Console.WriteLine(result.Content);
             }
+            return result;
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace ConnectToClavisterBlacklisting
         /// </summary>
         /// <param name="boolean"></param>
         /// <returns>yes or no</returns>
-        private static string ChangeBoolToString(bool boolean)
+        private string ChangeBoolToString(bool boolean)
         {
             if (boolean) { return "yes"; }
             else { return "no"; }
@@ -79,7 +79,7 @@ namespace ConnectToClavisterBlacklisting
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static async Task RemoveBlacklist(string param)
+        public async Task RemoveBlacklist(string param)
         {
             using var client = CreateClient();
             await client.DeleteAsync($"api/oper/blacklist?{param}");
@@ -91,7 +91,7 @@ namespace ConnectToClavisterBlacklisting
         /// </summary>
         /// <param name="alert_type"></param>
         /// <returns>Response from Clavister</returns>
-        public static async Task<ClavisterBlacklistResponse?> ListBlacklist()
+        public async Task<ClavisterBlacklistResponse?> ListBlacklist()
         {
             using var client = CreateClient();
             return await client.GetFromJsonAsync<ClavisterBlacklistResponse>($"api/oper/blacklist");

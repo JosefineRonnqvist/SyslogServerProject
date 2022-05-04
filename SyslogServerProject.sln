@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SyslogServerProject", "SyslogServerProject\SyslogServerProject.csproj", "{D38C8C4F-9D4F-4C2F-812E-E5DC000FF38C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectToClavisterBlacklistingTests", "SyslogServerProjectTests\ConnectToClavisterBlacklistingTests.csproj", "{2A07BB96-E449-46B2-938A-2EBEC59E464B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SyslogServerProjectTests", "SyslogServerProjectTests\SyslogServerProjectTests.csproj", "{2A07BB96-E449-46B2-938A-2EBEC59E464B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectToClavisterBlacklisting", "ConnectToClavisterBlacklistingApi\ConnectToClavisterBlacklisting.csproj", "{EA52107D-01CA-4FC5-821E-0F7F30A0285C}"
 EndProject

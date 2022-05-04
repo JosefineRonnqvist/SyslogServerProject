@@ -179,7 +179,8 @@ namespace SyslogServerProject.SyslogHandlers
         private void CallLogAndClavisterSender(int id, Blacklist blacklist)
         {
             LogBlacklist(id);
-            ToClavisterBlacklist.SendToClavisterBlacklist(blacklist);
+            ToClavisterBlacklist toClavisterBlacklist = new();
+            toClavisterBlacklist.SendToClavisterBlacklist(blacklist);
         }
 
         /// <summary>
@@ -187,7 +188,8 @@ namespace SyslogServerProject.SyslogHandlers
         /// </summary>
         public void PrintListOfBlacklist()
         {
-            var blacklistedList = ToClavisterBlacklist.ListBlacklist().Result;
+            ToClavisterBlacklist toClavisterBlacklist = new();
+            var blacklistedList = toClavisterBlacklist.ListBlacklist().Result;
             if (blacklistedList is null) throw new ArgumentNullException(nameof(blacklistedList));
 
             foreach (var blacklisted in blacklistedList.blacklist_hosts)

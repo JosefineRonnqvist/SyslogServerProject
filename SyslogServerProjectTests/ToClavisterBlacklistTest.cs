@@ -10,9 +10,11 @@ namespace SyslogServerProjectTests
         [TestMethod]
         public void SendToClavisterBlacklistReturn()
         {
+            ToClavisterBlacklist toClavisterBlacklist = new();
             Blacklist blacklist = new() { host_ip = "1.1.1.1" };
 
-            ToClavisterBlacklist.SendToClavisterBlacklist(blacklist);
+            var result =toClavisterBlacklist.SendToClavisterBlacklist(blacklist);
+            Assert.AreEqual(result.StatusCode, "200");
         }
     }
 }
