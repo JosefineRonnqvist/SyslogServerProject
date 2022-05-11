@@ -1,0 +1,17 @@
+Programmet lyssnar på syslog och sorterar ut fälten:
+	rule,
+	categories,
+	ip,
+	connsrcip,
+	conndestip,
+	connnewdestip,
+	score,
+	iprep_src_score,
+	iprep_dest,
+	iprep_dest_score
+Informationen loggas med notepad.
+Kollas om iprep_dest_score är för lågt eller category "phishing".
+Skickar ip eller connsrcip
+Registrerar i databas med datum
+Skickar till Clavister api
+
