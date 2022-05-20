@@ -24,7 +24,7 @@ namespace SyslogServerProject.SyslogHandlers
         /// <summary>
         /// Open stream writer to write log
         /// </summary>
-        public void HandleLog()
+        void HandleLog()
         {
             int attempts = 0;
 
@@ -51,22 +51,16 @@ namespace SyslogServerProject.SyslogHandlers
                     }
                 }
             }
-            WriteLog();
         }
 
         /// <summary>
         /// Write a log
         /// </summary>
-        void WriteLog()
+        void WriteLog(string iprep_dest_score, string categories, string connsrcip, string ip)
         {
             // Write the line if the file is accessible 
             if (canAccess)
             {
-                string iprep_dest_score = GetValue("iprep_dest_score=");
-                string categories = GetValue("categories=");               
-                string connsrcip = GetValue("connsrcip=");
-                string ip = GetValue("ip=");
-
                 if (logWriter is null) throw new ArgumentNullException(nameof(logWriter));
                 logWriter.WriteLine(DateTime.Now.ToString());
                 logWriter.WriteLine($"rule={GetValue("rule=")}");
@@ -79,10 +73,19 @@ namespace SyslogServerProject.SyslogHandlers
                 logWriter.WriteLine($"iprep_src_score={GetValue("iprep_src_score=")}");
                 logWriter.WriteLine($"iprep_dest={GetValue("iprep_dest=")}");
                 logWriter.WriteLine($"iprep_dest_score={iprep_dest_score}");
-                logWriter.Close();
-                CheckValues checkValues = new();
-                checkValues.CheckValue(iprep_dest_score,categories,connsrcip,ip);
+                logWriter.Close();              
             }
+        }
+        public void GetInterestingValues()
+        {
+            string iprep_dest_score = GetValue("iprep_dest_score=");
+            string categories = GetValue("categories=");
+            string connsrcip = GetValue("connsrcip=");
+            string ip = GetValue("ip=");
+            //HandleLog()
+            //WriteLog(iprep_dest_score, categories, connsrcip, ip);
+            CheckValues checkValues = new();
+            checkValues.CheckValue(iprep_dest_score, categories, connsrcip, ip);
         }
 
         /// <summary>

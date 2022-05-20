@@ -12,6 +12,7 @@ Programmet lyssnar på syslog och sorterar ut fälten:
 Informationen loggas med notepad.
 Kollas om iprep_dest_score är för lågt eller category "phishing".
 Skickar ip eller connsrcip
+Kollar om ip är vitlistad
 Registrerar i databas med datum
 Skickar till Clavister api
 

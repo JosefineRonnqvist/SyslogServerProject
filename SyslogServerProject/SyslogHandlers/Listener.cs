@@ -45,7 +45,7 @@ namespace SyslogServerProject.SyslogHandlers
                     Console.WriteLine($"Message from {sourceIP}:{remoteIpEndPoint.Port} received: ");
 
                     // Start a new thread to handle received syslog event 
-                    new Thread(new LogHandler(sourceIP, receivedAscii).HandleLog).Start();
+                    new Thread(new LogHandler(sourceIP, receivedAscii).GetInterestingValues).Start();
                 }
                 catch (Exception e)
                 {
