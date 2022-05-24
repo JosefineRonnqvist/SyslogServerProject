@@ -141,7 +141,7 @@ namespace SyslogServerProject.SyslogHandlers
                 if (blacklistLog is null) throw new ArgumentNullException(nameof(blacklistLog));
                 var numberOfLogs = blacklistLog.Count();
 
-                if (!alreadyInDB.whitelisted)
+                if (3<alreadyInDB.whitelisted)
                 {
                     if (alreadyInDB.logDate.AddSeconds(alreadyInDB.ttl) < DateTime.Now)
                     {
