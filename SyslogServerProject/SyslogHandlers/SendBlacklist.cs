@@ -133,14 +133,13 @@ namespace SyslogServerProject.SyslogHandlers
             Console.WriteLine("Send to blacklist: " + blacklist.host_ip);
             var alreadyInDB = CheckIfIpIsBlacklisted(blacklist.host_ip).Result;
 
-
             if (alreadyInDB is not null)
             {
                 var blacklistLog = CheckIpBlacklistLog(alreadyInDB.id).Result;
                 if (blacklistLog is null) throw new ArgumentNullException(nameof(blacklistLog));
                 var numberOfLogs = blacklistLog.Count();
 
-                if (3<alreadyInDB.whitelisted)
+                if (1<alreadyInDB.whitelisted)
                 {
                     if (alreadyInDB.logDate.AddSeconds(alreadyInDB.ttl) < DateTime.Now)
                     {
@@ -150,7 +149,7 @@ namespace SyslogServerProject.SyslogHandlers
                             DeleteOldestBlacklist(id);
                         }
                         UpdateBlacklistInDB(alreadyInDB);
-                        CallLogAndClavisterSender(alreadyInDB.id, blacklist);
+                        CallLogAndClavisterSender(alreadyInDB);
                         Console.WriteLine($"{blacklist.host_ip} has been blacklisted before");
                     }
                     else
@@ -164,9 +163,9 @@ namespace SyslogServerProject.SyslogHandlers
                 }
             }
             else if (alreadyInDB is null)
-            {
-                var id = SendNewBlacklistToDB(blacklist.host_ip);
-                CallLogAndClavisterSender(id, blacklist);
+            {               
+                blacklist.id = SendNewBlacklistToDB(blacklist.host_ip);
+                CallLogAndClavisterSender(blacklist);
             }
         }
 
@@ -175,9 +174,9 @@ namespace SyslogServerProject.SyslogHandlers
         /// </summary>
         /// <param name="id"></param>
         /// <param name="blacklist"></param>
-        private void CallLogAndClavisterSender(int id, Blacklist blacklist)
+        private void CallLogAndClavisterSender(Blacklist blacklist)
         {
-            LogBlacklist(id);
+            LogBlacklist(blacklist.id);
             ToClavisterBlacklist toClavisterBlacklist = new();
             toClavisterBlacklist.SendToClavisterBlacklist(blacklist);
         }

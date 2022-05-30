@@ -1,6 +1,7 @@
 ﻿using ConnectToClavisterBlacklisting;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -12,15 +13,14 @@ namespace SyslogServerProject.SyslogHandlers
     //https://www.codeproject.com/Tips/441233/Multithreaded-Customizable-SysLog-Server-Csharp <= code found here
     internal class Listener
     {
-        private const int PORT_NUMBER = 514;
+        public static int PORT_NUMBER = Convert.ToInt32(ConfigurationManager.AppSettings.Get("port_number"));
+        public DateTime CheckTime;
 
         /// <summary>
         /// Recives messages from syslog and change format
         /// </summary>
         public static void SyslogReader()
-        {
-            string sourceIP;
-            
+        {           
             Console.WriteLine($"Syslog server started. Listening on port {PORT_NUMBER}...");
 
             //UdpClient reads incoming data
@@ -34,7 +34,7 @@ namespace SyslogServerProject.SyslogHandlers
             {
                 try
                 {
-                    sourceIP = remoteIpEndPoint.Address.ToString();
+                    var sourceIP = remoteIpEndPoint.Address.ToString();
 
                     // Blocks until a message returns on this socket from a remote host.
                     Byte[] receivedBytes = receivingUdpClient.Receive(ref remoteIpEndPoint);
@@ -52,6 +52,20 @@ namespace SyslogServerProject.SyslogHandlers
                     Console.WriteLine(e.ToString());
                 }
             }
+        }
+
+        private async void CheckIfTimeForCheck()
+        {
+            if (CheckTime.AddMinutes(10) < DateTime.Now) 
+            {
+                await CheckIfTimeToRenew();
+                CheckTime = DateTime.Now;
+            }
+        }
+
+        private async CheckIfTimeToRenew()
+        {
+            throw new NotImplementedException();
         }
     }
 }
