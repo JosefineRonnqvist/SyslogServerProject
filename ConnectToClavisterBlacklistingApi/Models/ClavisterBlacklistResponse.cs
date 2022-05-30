@@ -11,7 +11,7 @@ namespace ConnectToClavisterBlacklisting.Models
     /// </summary>
     public class BlacklistHost
     {
-        public string host { get; set; }
+        public string host { get; set; } = "";
         public string? service { get; set; }
         public int? ttl { get; set; }
         public string? alert_type { get; set; }

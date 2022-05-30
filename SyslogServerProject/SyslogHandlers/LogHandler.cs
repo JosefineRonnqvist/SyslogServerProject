@@ -76,6 +76,10 @@ namespace SyslogServerProject.SyslogHandlers
                 logWriter.Close();              
             }
         }
+
+        /// <summary>
+        /// Use field name to get the values to check if suspicious
+        /// </summary>
         public void GetInterestingValues()
         {
             string iprep_dest_score = GetValue("iprep_dest_score=");

@@ -24,9 +24,9 @@ namespace SyslogServerProject.SyslogHandlers
         }
 
         /// <summary>
-        /// Sends new blacklist to database, wuth todays date
+        /// Sends new blacklist to database, with todays date
         /// </summary>
-        /// <param name="ip"></param>
+        /// <param name="ip">ip to blacklist</param>
         private int SendNewBlacklistToDB(string ip)
         {
             using (IDbConnection conn = new SqlConnection(connectionString))
@@ -46,7 +46,7 @@ namespace SyslogServerProject.SyslogHandlers
         /// Check if ip is in database
         /// </summary>
         /// <param name="ip"></param>
-        /// <returns></returns>
+        /// <returns>The blacklist in db, or null</returns>
         private async Task<Blacklist?> CheckIfIpIsBlacklisted(string ip)
         {
             var query = @"SELECT id, host_ip, whitelisted FROM Blacklisted WHERE host_ip=@ip";
@@ -83,7 +83,6 @@ namespace SyslogServerProject.SyslogHandlers
         /// Update existing blacklist with new logdate
         /// </summary>
         /// <param name="blacklistInDB">blacklist with ip blacklisted before</param>
-        /// <returns></returns>
         private void UpdateBlacklistInDB(Blacklist blacklistInDB)
         {
             using (IDbConnection conn = new SqlConnection(connectionString))
@@ -112,7 +111,7 @@ namespace SyslogServerProject.SyslogHandlers
         }
 
         /// <summary>
-        /// Delete log when to many
+        /// Delete log when to many is saved
         /// </summary>
         /// <param name="id">id of logged blacklist</param>
         private void DeleteOldestBlacklist(int id)
@@ -126,7 +125,7 @@ namespace SyslogServerProject.SyslogHandlers
         /// <summary>
         /// Send ip to blacklist.
         /// Check if blacklisted before, if time to live ended and if whitelisted.
-        /// log the blacklist, if more then 10 is logged delete oldest. 
+        /// Log the blacklist, if more then 10 is logged delete oldest. 
         /// </summary>
         /// <param name="ip">the ip address to blacklist</param>
         public void SendToBlacklist(Blacklist blacklist)

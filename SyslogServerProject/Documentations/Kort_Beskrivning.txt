@@ -9,7 +9,7 @@ Programmet lyssnar på syslog och sorterar ut fälten:
 	iprep_src_score,
 	iprep_dest,
 	iprep_dest_score
-Informationen loggas med notepad.
+Kod finns för att logga information till notepad, men det är utkommenterat eftersom en inte vill logga så mycket så.
 Kollas om iprep_dest_score är för lågt eller category "phishing".
 Skickar ip eller connsrcip
 Kollar om ip är vitlistad
