@@ -1,6 +1,6 @@
 ﻿using SyslogServerProject.Models;
 using SyslogServerProject.SyslogHandlers;
 
-
-Listener.SyslogReader();
+Listener listener = new();
+listener.SyslogReader();
 

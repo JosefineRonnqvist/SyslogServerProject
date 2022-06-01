@@ -35,6 +35,7 @@ namespace SyslogServerProject.SyslogHandlers
                 {
                     logDate = DateTime.Now,
                     host_ip = ip,
+                    whitelisted =4,
                 };
                 var id = (int)conn.Insert(blacklist);
                 Console.WriteLine("Id in DB: " + id);
@@ -148,6 +149,7 @@ namespace SyslogServerProject.SyslogHandlers
                             var id = blacklistLog.Last().id;
                             DeleteOldestBlacklist(id);
                         }
+                        alreadyInDB.whitelisted = 4;
                         UpdateBlacklistInDB(alreadyInDB);
                         CallLogAndClavisterSender(alreadyInDB);
                         Console.WriteLine($"{blacklist.host_ip} has been blacklisted before");
@@ -182,17 +184,21 @@ namespace SyslogServerProject.SyslogHandlers
         }
 
         /// <summary>
-        /// Get list of ip blacklisted by Clavister api
+        /// Gets all blacklists that are meant to renew and check if time ended and renew
         /// </summary>
-        public void PrintListOfBlacklist()
+        public async void CheckBlacklistToRenew()
         {
-            ToClavisterBlacklist toClavisterBlacklist = new();
-            var blacklistedList = toClavisterBlacklist.ListBlacklist().Result;
-            if (blacklistedList is null) throw new ArgumentNullException(nameof(blacklistedList));
-
-            foreach (var blacklisted in blacklistedList.blacklist_hosts)
+            var query = @"SELECT id, host_ip, logDate, ttl, renewBlacklist FROM Blacklisted WHERE renewBlacklist=1";
+            using (IDbConnection conn = new SqlConnection(connectionString))
             {
-                Console.WriteLine($"Found in Clavister Blacklist: {blacklisted}");
+                var blacklistWithRenew = await conn.QueryAsync<Blacklist>(query);
+                foreach(var blacklist in blacklistWithRenew)
+                {
+                    if (blacklist.logDate.AddSeconds(blacklist.ttl) < DateTime.Now)
+                    {
+                        SendToBlacklist(blacklist);
+                    }
+                }
             }
         }
     }

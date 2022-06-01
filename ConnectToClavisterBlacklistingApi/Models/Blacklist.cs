@@ -24,7 +24,7 @@ namespace SyslogServerProject.Models
         public string rule_name { get; set; } = "null";
         public bool close_established { get; set; } = false;
         public string description { get; set; } = "null";
-        public int whitelisted { get; set; } = 0;   //Whitelisted =1, Blacklisted with ended time = neutral = 2, Blacklisted = 4
+        public int whitelisted { get; set; } = 2;   //Whitelisted =1, Blacklisted with ended time = neutral = 2, Blacklisted = 4
         public int user_id { get; set; }
         public DateTime? changeDate { get; set; }
         public int renewBlacklist { get; set; } = 0;  //if you want to renew blacklist =1

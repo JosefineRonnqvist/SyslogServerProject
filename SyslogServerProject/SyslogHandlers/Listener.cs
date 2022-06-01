@@ -14,12 +14,12 @@ namespace SyslogServerProject.SyslogHandlers
     internal class Listener
     {
         public static int PORT_NUMBER = Convert.ToInt32(ConfigurationManager.AppSettings.Get("port_number"));
-        public DateTime CheckTime;
+        public DateTime CheckTime = DateTime.Now;
 
         /// <summary>
         /// Recives messages from syslog and change format
         /// </summary>
-        public static void SyslogReader()
+        public void SyslogReader()
         {           
             Console.WriteLine($"Syslog server started. Listening on port {PORT_NUMBER}...");
 
@@ -51,21 +51,18 @@ namespace SyslogServerProject.SyslogHandlers
                 {
                     Console.WriteLine(e.ToString());
                 }
+                CheckIfTimeForCheckIfRenew();
             }
         }
 
-        private async void CheckIfTimeForCheck()
+        public void CheckIfTimeForCheckIfRenew()
         {
             if (CheckTime.AddMinutes(10) < DateTime.Now) 
             {
-                await CheckIfTimeToRenew();
+                SendBlacklist send = new();
+                send.CheckBlacklistToRenew();
                 CheckTime = DateTime.Now;
             }
-        }
-
-        private async CheckIfTimeToRenew()
-        {
-            throw new NotImplementedException();
         }
     }
 }

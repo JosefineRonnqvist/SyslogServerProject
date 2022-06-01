@@ -36,21 +36,26 @@ namespace SyslogServerProject.SyslogHandlers
             {
                 if (connsrcip is not null && connsrcip.Trim() != "")
                 {
-                    Blacklist blacklist = new()
-                    {
-                        host_ip = connsrcip,
-                    };
-                    sendBlacklist.SendToBlacklist(blacklist);
+                    NewBlacklist(connsrcip);
                 }
                 if (ip is not null && ip.Trim() != "")
                 {
-                    Blacklist blacklist = new()
-                    {
-                        host_ip = ip,
-                    };
-                    sendBlacklist.SendToBlacklist(blacklist);
+                    NewBlacklist(ip);
                 }
             }
+        }
+
+        /// <summary>
+        /// Create new blacklist
+        /// </summary>
+        /// <param name="ip"></param>
+        private void NewBlacklist(string ip)
+        {
+            Blacklist blacklist = new()
+            {
+                host_ip = ip,
+            };
+            sendBlacklist.SendToBlacklist(blacklist);
         }
 
         /// <summary>
