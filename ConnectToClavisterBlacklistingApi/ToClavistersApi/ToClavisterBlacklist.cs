@@ -1,6 +1,7 @@
 ﻿using ConnectToClavisterBlacklisting.Models;
 using SyslogServerProject.Models;
 using System.Configuration;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -18,19 +19,31 @@ namespace ConnectToClavisterBlacklisting
         /// <returns>Connection to Clavisters api</returns>
         private HttpClient CreateClient()
         {
-            HttpClientHandler handler = new();
-            handler.ClientCertificateOptions = ClientCertificateOption.Manual;
-            handler.ServerCertificateCustomValidationCallback =
+            try
+            {
+                HttpClientHandler handler = new();
+                handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+                handler.ServerCertificateCustomValidationCallback =
 
-                (httpRequestMessage, cert, cetChain, policyErrors) =>
+                    (httpRequestMessage, cert, cetChain, policyErrors) =>
+                    {
+                        return true;
+                    };
+                HttpClient client = new(handler);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                Convert.ToBase64String(Encoding.Default.GetBytes($"{ConfigurationManager.AppSettings["username"]}:{ConfigurationManager.AppSettings["password"]}")));
+                client.BaseAddress = new Uri($"{ConfigurationManager.AppSettings.Get("baseUri")}");
+                return client;
+            } 
+            catch (Exception ex)
+            {
+                using (EventLog eventLog = new EventLog("Application"))
                 {
-                    return true;
-                };
-            HttpClient client = new(handler);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-            Convert.ToBase64String(Encoding.Default.GetBytes($"{ConfigurationManager.AppSettings["username"]}:{ConfigurationManager.AppSettings["password"]}")));
-            client.BaseAddress = new Uri($"{ConfigurationManager.AppSettings.Get("baseUri")}");
-            return client;
+                    eventLog.Source = "CoreITClavisterSyslogService";
+                    eventLog.WriteEntry("Exception creating client: " + ex, EventLogEntryType.Information);
+                }
+                return null;
+            }
         }
 
         /// <summary>

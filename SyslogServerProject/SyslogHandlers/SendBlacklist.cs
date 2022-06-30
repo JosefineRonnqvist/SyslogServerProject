@@ -35,7 +35,7 @@ namespace SyslogServerProject.SyslogHandlers
                 {
                     logDate = DateTime.Now,
                     host_ip = ip,
-                    whitelisted =4,
+                    whitelisted =Whitelist.blacklisted,
                 };
                 var id = (int)conn.Insert(blacklist);
                 Console.WriteLine("Id in DB: " + id);
@@ -140,7 +140,7 @@ namespace SyslogServerProject.SyslogHandlers
                 if (blacklistLog is null) throw new ArgumentNullException(nameof(blacklistLog));
                 var numberOfLogs = blacklistLog.Count();
 
-                if (1<alreadyInDB.whitelisted)
+                if (alreadyInDB.whitelisted!=Whitelist.whitelisted)
                 {
                     if (alreadyInDB.logDate.AddSeconds(alreadyInDB.ttl) < DateTime.Now)
                     {
@@ -149,7 +149,7 @@ namespace SyslogServerProject.SyslogHandlers
                             var id = blacklistLog.Last().id;
                             DeleteOldestBlacklist(id);
                         }
-                        alreadyInDB.whitelisted = 4;
+                        alreadyInDB.whitelisted = Whitelist.blacklisted;
                         UpdateBlacklistInDB(alreadyInDB);
                         CallLogAndClavisterSender(alreadyInDB);
                         Console.WriteLine($"{blacklist.host_ip} has been blacklisted before");
