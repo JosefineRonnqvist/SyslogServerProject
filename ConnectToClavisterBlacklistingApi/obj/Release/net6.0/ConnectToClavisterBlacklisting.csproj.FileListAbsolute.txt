@@ -1,0 +1,13 @@
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\bin\Release\net6.0\ConnectToClavisterBlacklisting.dll.config
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\bin\Release\net6.0\ConnectToClavisterBlacklisting.deps.json
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\bin\Release\net6.0\ConnectToClavisterBlacklisting.dll
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\bin\Release\net6.0\ConnectToClavisterBlacklisting.pdb
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\obj\Release\net6.0\ConnectToClavisterBlacklisting.csproj.AssemblyReference.cache
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\obj\Release\net6.0\ConnectToClavisterBlacklisting.GeneratedMSBuildEditorConfig.editorconfig
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\obj\Release\net6.0\ConnectToClavisterBlacklisting.AssemblyInfoInputs.cache
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\obj\Release\net6.0\ConnectToClavisterBlacklisting.AssemblyInfo.cs
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\obj\Release\net6.0\ConnectToClavisterBlacklisting.csproj.CoreCompileInputs.cache
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\obj\Release\net6.0\ConnectToClavisterBlacklisting.dll
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\obj\Release\net6.0\refint\ConnectToClavisterBlacklisting.dll
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\obj\Release\net6.0\ConnectToClavisterBlacklisting.pdb
+C:\Syslog\SyslogServerProject\ConnectToClavisterBlacklistingApi\obj\Release\net6.0\ref\ConnectToClavisterBlacklisting.dll
