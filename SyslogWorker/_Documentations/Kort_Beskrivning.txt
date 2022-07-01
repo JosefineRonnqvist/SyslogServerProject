@@ -1,0 +1,26 @@
+Programmet lyssnar på syslog och sorterar ut fälten:
+	rule,
+	categories,
+	ip,
+	connsrcip,
+	conndestip,
+	connnewdestip,
+	score,
+	iprep_src_score,
+	iprep_dest,
+	iprep_dest_score
+Kod finns för att logga information till notepad, men det är utkommenterat eftersom en inte vill logga så mycket så.
+Kollas om iprep_dest_score är för lågt eller category "phishing".
+Skickar ip eller connsrcip
+Kollar om ip är vitlistad
+Registrerar i databas med datum
+Skickar till Clavister api
+
+
+
+Installation
+-------------
+
+sc create CoreIT_Clavister_Syslog binpath=C:\Syslog\SyslogWorker\SyslogWorker\bin\Debug\net6.0
+
+sc delete Coreit_clavister_syslog

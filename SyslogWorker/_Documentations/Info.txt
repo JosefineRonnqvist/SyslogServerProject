@@ -1,0 +1,2 @@
+﻿eventcreate /ID 1 /L APPLICATION /T INFORMATION /SO "CoreITClavisterSyslogService"/D "test event"
+Körs i command prompt som admin för att ge tillåtelse till service att skriva till eventlog.
